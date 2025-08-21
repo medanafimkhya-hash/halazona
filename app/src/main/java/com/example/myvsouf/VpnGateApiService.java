@@ -120,12 +120,18 @@ public class VpnGateApiService {
                     server.message = parts[13];
                     server.openVpnConfig = parts[14];
                     
-                    // Only add servers with valid data
-                    if (!server.ip.isEmpty() && !server.countryLong.isEmpty()) {
+                    // Only add servers with valid data and OpenVPN config
+                    if (!server.ip.isEmpty() && !server.countryLong.isEmpty() 
+                        && server.openVpnConfig != null && !server.openVpnConfig.isEmpty()
+                        && server.hasValidOpenVpnConfig()) {
                         servers.add(server);
+                        Log.d(TAG, "Added server: " + server.countryLong + " (" + server.countryShort + ") - " + server.ip);
                     }
                 }
             }
+            
+            Log.d(TAG, "Total servers parsed: " + servers.size());
+            
         } catch (Exception e) {
             Log.e(TAG, "Error parsing CSV data", e);
         }
