@@ -175,10 +175,8 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void startVpnService() {
-        // Start the VPN service
-        Intent intent = new Intent(this, MyVpnService.class);
-        intent.setAction("START_VPN");
-        startService(intent);
+        // Demo mode - don't actually start VPN service to avoid blocking internet
+        // For educational purposes only
         
         isConnected = true;
         connectionStartTime = System.currentTimeMillis();
@@ -186,15 +184,11 @@ public class MainActivity extends AppCompatActivity {
         updateConnectionStatus();
         startTimer();
         
-        Toast.makeText(this, "VPN Connected", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "VPN Connected (Demo Mode - Internet Preserved)", Toast.LENGTH_LONG).show();
     }
     
     private void disconnectVpn() {
-        // Stop the VPN service
-        Intent intent = new Intent(this, MyVpnService.class);
-        intent.setAction("STOP_VPN");
-        startService(intent);
-        
+        // Demo mode - just update UI
         isConnected = false;
         stopTimer();
         updateConnectionStatus();
