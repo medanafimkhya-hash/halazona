@@ -62,9 +62,9 @@ public class VpnGateApiService {
                 }
                 
                 String responseBody = response.body().string();
-                Log.d(TAG, "Raw API Response: " + responseBody);
+                Log.d(TAG, "Raw API Response length: " + responseBody.length());
                 
-                // Parse CSV format from VPN Gate API
+                // Parse CSV format from VPN Gate API for ALL COUNTRIES
                 return parseVpnServers(responseBody);
                 
             } catch (IOException e) {
@@ -120,17 +120,24 @@ public class VpnGateApiService {
                     server.message = parts[13];
                     server.openVpnConfig = parts[14];
                     
-                    // Only add servers with valid data and OpenVPN config
+                    // Only add servers with valid data and OpenVPN config for ALL COUNTRIES
                     if (!server.ip.isEmpty() && !server.countryLong.isEmpty() 
                         && server.openVpnConfig != null && !server.openVpnConfig.isEmpty()
                         && server.hasValidOpenVpnConfig()) {
                         servers.add(server);
-                        Log.d(TAG, "Added server: " + server.countryLong + " (" + server.countryShort + ") - " + server.ip);
+                        Log.d(TAG, "Added server: " + server.countryLong + " (" + server.countryShort + ") - " + server.ip + " - Speed: " + server.getFormattedSpeed());
                     }
                 }
             }
             
-            Log.d(TAG, "Total servers parsed: " + servers.size());
+            Log.d(TAG, "Total servers parsed from ALL countries: " + servers.size());
+            
+            // Log unique countries found
+            java.util.Set<String> countries = new java.util.HashSet<>();
+            for (VpnServer server : servers) {
+                countries.add(server.countryLong + " " + server.getCountryFlag());
+            }
+            Log.d(TAG, "Countries available: " + countries);
             
         } catch (Exception e) {
             Log.e(TAG, "Error parsing CSV data", e);

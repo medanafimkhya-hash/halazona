@@ -108,43 +108,11 @@ public class VpnServer implements Serializable {
             case "MG": return "🇲🇬";
             case "MU": return "🇲🇺";
             case "SC": return "🇸🇨";
-            case "RE": return "🇷🇪";
-            case "YT": return "🇾🇹";
-            case "KM": return "🇰🇲";
-            case "DJ": return "🇩🇯";
-            case "SO": return "🇸🇴";
-            case "ET": return "🇪🇹";
-            case "ER": return "🇪🇷";
-            case "SD": return "🇸🇩";
-            case "SS": return "🇸🇸";
-            case "CF": return "🇨🇫";
-            case "TD": return "🇹🇩";
-            case "NE": return "🇳🇪";
-            case "ML": return "🇲🇱";
-            case "BF": return "🇧🇫";
-            case "CI": return "🇨🇮";
-            case "LR": return "🇱🇷";
-            case "SL": return "🇸🇱";
-            case "GN": return "🇬🇳";
-            case "GW": return "🇬🇼";
-            case "GM": return "🇬🇲";
-            case "SN": return "🇸🇳";
-            case "MR": return "🇲🇷";
-            case "CV": return "🇨🇻";
-            case "ST": return "🇸🇹";
-            case "GQ": return "🇬🇶";
-            case "GA": return "🇬🇦";
-            case "CM": return "🇨🇲";
-            case "CG": return "🇨🇬";
-            case "CD": return "🇨🇩";
-            case "AO": return "🇦🇴";
-            case "NA": return "🇳🇦";
-            case "LS": return "🇱🇸";
-            case "SZ": return "🇸🇿";
             default: return "🌍";
         }
     }
     
+    // NEW METHODS FOR ALL COUNTRIES VPN SUPPORT
     public boolean hasValidOpenVpnConfig() {
         return openVpnConfig != null && !openVpnConfig.isEmpty() && openVpnConfig.length() > 100;
     }

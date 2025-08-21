@@ -100,27 +100,39 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void loadDefaultServer() {
-        // Load servers and set default US server
+        // Load servers and set default server from any available country
         apiService.fetchVpnServers(new VpnGateApiService.VpnServerCallback() {
             @Override
             public void onSuccess(List<VpnServer> servers) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        // Find a US server as default
+                        // Find best server (highest speed) as default
+                        VpnServer bestServer = null;
+                        long bestSpeed = 0;
+                        
                         for (VpnServer server : servers) {
-                            if ("US".equals(server.countryShort)) {
-                                currentServer = server;
-                                updateServerDisplay();
-                                break;
+                            try {
+                                long speed = Long.parseLong(server.speed);
+                                if (speed > bestSpeed) {
+                                    bestSpeed = speed;
+                                    bestServer = server;
+                                }
+                            } catch (NumberFormatException e) {
+                                // ignore
                             }
                         }
                         
-                        // If no US server found, use first available
-                        if (currentServer == null && !servers.isEmpty()) {
+                        if (bestServer != null) {
+                            currentServer = bestServer;
+                            updateServerDisplay();
+                        } else if (!servers.isEmpty()) {
+                            // If no speed info, use first server
                             currentServer = servers.get(0);
                             updateServerDisplay();
                         }
+                        
+                        Toast.makeText(MainActivity.this, "Loaded " + servers.size() + " servers from " + getUniqueCountries(servers) + " countries", Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -139,11 +151,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     
+    private int getUniqueCountries(List<VpnServer> servers) {
+        java.util.Set<String> countries = new java.util.HashSet<>();
+        for (VpnServer server : servers) {
+            countries.add(server.countryShort);
+        }
+        return countries.size();
+    }
+    
     private void setDefaultServer() {
         currentServer = new VpnServer();
-        currentServer.countryLong = "United States";
-        currentServer.countryShort = "US";
-        currentServer.ping = "8";
+        currentServer.countryLong = "Japan";
+        currentServer.countryShort = "JP";
+        currentServer.ping = "12";
+        currentServer.speed = "100000000";
         updateServerDisplay();
     }
     
@@ -175,8 +196,16 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void startVpnService() {
-        // Demo mode - don't actually start VPN service to avoid blocking internet
-        // For educational purposes only
+        if (currentServer == null) {
+            Toast.makeText(this, "Please select a server first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // Start VPN service with selected server (ANY COUNTRY)
+        Intent intent = new Intent(this, MyVpnService.class);
+        intent.setAction("START_VPN");
+        intent.putExtra("server", currentServer); // Pass the selected server
+        startService(intent);
         
         isConnected = true;
         connectionStartTime = System.currentTimeMillis();
@@ -184,16 +213,20 @@ public class MainActivity extends AppCompatActivity {
         updateConnectionStatus();
         startTimer();
         
-        Toast.makeText(this, "VPN Connected (Demo Mode - Internet Preserved)", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Connecting to " + currentServer.countryLong + " " + currentServer.getCountryFlag() + "\nYour IP will change to " + currentServer.countryLong, Toast.LENGTH_LONG).show();
     }
     
     private void disconnectVpn() {
-        // Demo mode - just update UI
+        // Stop the VPN service
+        Intent intent = new Intent(this, MyVpnService.class);
+        intent.setAction("STOP_VPN");
+        startService(intent);
+        
         isConnected = false;
         stopTimer();
         updateConnectionStatus();
         
-        Toast.makeText(this, "VPN Disconnected", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "VPN Disconnected - IP restored", Toast.LENGTH_SHORT).show();
     }
     
     private void updateConnectionStatus() {
@@ -243,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
             if (selectedServer != null) {
                 currentServer = selectedServer;
                 updateServerDisplay();
-                Toast.makeText(this, "Server changed to " + selectedServer.countryLong, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Server changed to " + selectedServer.countryLong + " " + selectedServer.getCountryFlag(), Toast.LENGTH_LONG).show();
             }
         }
     }
