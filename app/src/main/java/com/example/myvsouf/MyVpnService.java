@@ -13,9 +13,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
 
 public class MyVpnService extends VpnService {
     private static final String TAG = "MyVpnService";
